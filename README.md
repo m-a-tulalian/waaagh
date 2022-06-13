@@ -1,11 +1,11 @@
 # waaagh
 USER MANUAL
 
-DISCLAIMER!!	
-  This program (The Defensive Siege Battle AI: Waaagh!) is in no way associated with Creative Assembly or Games Workshop. This software was created solely for educational reasons, with no intention of exploiting the game in any manner. By clicking Okay, you agree that the software may change and/or manage your game selections, as well as manipulate your mouse and keyboard operations to some extent.
+DISCLAIMER!!
+This program (The Defensive Siege Battle AI: Waaagh!) is in no way associated with Creative Assembly or Games Workshop. This software was created solely for educational reasons, with no intention of exploiting the game in any manner. By clicking Okay, you agree that the software may change and/or manage your game selections, as well as manipulate your mouse and keyboard operations to some extent.
   
 What is “The Defensive Siege AI: Waaagh!”?
-  The Defensive Siege AI: Waaagh! or Waaagh! is a bot that aims to emulate a player by controlling the user's soldiers in a defensive siege fight using keyboard and mouse inputs. The AI's goal is to alleviate the player's stress and win the defensive siege battle. The researchers built the project on the Python language (Python 3.9 as of June 2022) with elements of the tkinter module for the user interface and pyautogui for image recognition and gathering visual data.
+The Defensive Siege AI: Waaagh! or Waaagh! is a bot that aims to emulate a player by controlling the user's soldiers in a defensive siege fight using keyboard and mouse inputs. The AI's goal is to alleviate the player's stress and win the defensive siege battle. The researchers built the project on the Python language (Python 3.9 as of June 2022) with elements of the tkinter module for the user interface and pyautogui for image recognition and gathering visual data.
 
 Features
 - Game Detector
