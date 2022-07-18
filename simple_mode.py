@@ -10,59 +10,64 @@ import win32api, win32con
 import pyKey
 from pyKey import pressKey, releaseKey, press, sendSequence, showKeys
 
+global finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX, mapCenterY, mapCenterX, capturePointX, capturePointY, total_units, units, ranged_array, monster_array, infantry_array, lord_card_position_x, lord_card_position_y
 # ************************ MAIN ALGO ************************ #
 class SimpleMode:
     def __init__(self):
         pass
 
-    # SM MAIN #
-    def smActive(self, mon_values, m_values, i_values, battle_master_bop_adjust_x, battle_master_bop_adjust_y, defense_line, confidence, game_Pointx , game_Pointy):
-        # ** code test order ** #
-        # ** INITIALIZATION ** #
+    def mainTacticianTrait(self, game_Pointx, game_Pointy):
+        global finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX, mapCenterY, mapCenterX, capturePointX, capturePointY, total_units, units, lord_card_position_x, lord_card_position_y
+        self.mapDrag ()
+        self.toggleuniticon ()
+        finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX, mapCenterY, mapCenterX = self.get_MapSize ()
+        capturePointX, capturePointY = self.get_CapturePointData ( finalMapSizeX, finalMapSizeY, mapCornerX )
+        total_units, units = self.unit_Counter ( game_Pointx, game_Pointy, finalMapSizeY, finalMapSizeX, mapCornerX )
+        lord_card_position_x, lord_card_position_y = self.get_lord_data ( finalMapSizeY, finalMapSizeX, mapCornerX )
+
+    def mainCommanderTrait(self,mon_values, m_values, i_values):
+        global ranged_array, monster_array, infantry_array
+        self.place_AllUnitsCapPoint ( capturePointX, capturePointY, total_units, finalMapSizeY, finalMapSizeX,
+                                      mapCornerX )
+        ranged_array, monster_array, infantry_array = self.commander_placement ( units, mon_values, m_values, i_values,
+                                                                                 total_units, finalMapSizeY,
+                                                                                 finalMapSizeX,
+                                                                                 mapCornerX )
+        monster_array.append ( 4 )
+        monster_array.append ( 13 )
+        self.toggle_GuardMode ( 1 )
+
+    def mainTrackerTrait(self, defense_line, confidence):
         halt = 0
         counter = 0
         halt_counter = 0
         back_unit = 0
         back_unit_far = 0
-        # ** PREP PHASE ** #
-        self.mapDrag()
-        finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX, mapCenterY, mapCenterX = self.get_MapSize ()
-        self.toggleuniticon ()
-        capturePointX, capturePointY = self.get_CapturePointData ( finalMapSizeX, finalMapSizeY, mapCornerX )
-        total_units, units = self.unit_Counter (game_Pointx , game_Pointy, finalMapSizeY, finalMapSizeX, mapCornerX)
-        self.place_AllUnitsCapPoint ( capturePointX, capturePointY, total_units, finalMapSizeY, finalMapSizeX , mapCornerX)
-        ranged_array, monster_array, infantry_array = self.commander_placement ( units, mon_values, m_values, i_values, total_units, finalMapSizeY, finalMapSizeX, mapCornerX )  # MIGS HOW DO I GET  mon_values, m_values, i_values from user????????
-        monster_array.append(4)
-        monster_array.append(13)
-        self.toggle_GuardMode (1)
-        self.startBattle ()
-        # ** BATTLE PHASE ** #
-        lord_card_position_x, lord_card_position_y = self.get_lord_data(finalMapSizeY, finalMapSizeX, mapCornerX)
         enemy_close = self.find_enemy_horizontal_map (
-            defense_line, finalMapSizeX, mapCornerY, mapCornerX)
+            defense_line, finalMapSizeX, mapCornerY, mapCornerX )
         while enemy_close is False:
             while halt == 0:
-                self.enemy_tracker ( finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX)
+                self.enemy_tracker ( finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX )
                 enemy_close = self.find_enemy_horizontal_map (
-                    defense_line, finalMapSizeX, mapCornerY, mapCornerX)
+                    defense_line, finalMapSizeX, mapCornerY, mapCornerX )
                 if enemy_close is True:
                     if back_unit == 1:
                         press ( key='ENTER', sec=.03 )
                         time.sleep ( .1 )
                         pressKey ( key='CTRL' )
                         for mpos in monster_array:
-                            self.click_assigned_unit(lord_card_position_x, lord_card_position_y, mpos, total_units)
+                            self.click_assigned_unit ( lord_card_position_x, lord_card_position_y, mpos, total_units )
                             time.sleep ( .1 )
                         time.sleep ( .3 )
                         releaseKey ( key='CTRL' )
                         time.sleep ( .5 )
-                        self.attack_first_center_area_small (confidence ,finalMapSizeY, finalMapSizeX, mapCornerX )
+                        self.attack_first_center_area_small ( confidence, finalMapSizeY, finalMapSizeX, mapCornerX )
                         press ( key='ENTER', sec=.03 )
                         time.sleep ( .1 )
-                        self.toggle_skills (lord_card_position_x, lord_card_position_y)
+                        self.toggle_skills ( lord_card_position_x, lord_card_position_y )
                         time.sleep ( .1 )
                     if back_unit == 6:
-                        self.bring_unit_back(mapCenterX , mapCenterY - 130)
+                        self.bring_unit_back ( mapCenterX, mapCenterY - 130 )
                     if back_unit == 13:
                         back_unit = 0
                         back_unit_far = 0
@@ -73,28 +78,32 @@ class SimpleMode:
                     back_unit += 1
                     back_unit_far += 1
                     if counter == 30:
-                        self.toggle_all_fireatwill()
+                        self.toggle_all_fireatwill ()
                     if counter > 160:
-                        self.toggle_GuardMode(0)
-                        self.attackAll (confidence, finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX)
+                        self.toggle_GuardMode ( 0 )
+                        self.attackAll ( confidence, finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX )
                         halt = 1
                 halt_counter += 1
                 if halt_counter > 250:
                     self.attackAll ( confidence, finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX )
                     halt = 1
-        battle_end = self.battle_master_bop_player(battle_master_bop_adjust_x, battle_master_bop_adjust_y, finalMapSizeX, mapCornerX)
+
+    def mainBattleMasterTrait(self, battle_master_bop_adjust_x, battle_master_bop_adjust_y, confidence):
+        battle_end = self.battle_master_bop_player ( battle_master_bop_adjust_x, battle_master_bop_adjust_y,
+                                                     finalMapSizeX, mapCornerX )
         while battle_end <= 60:
-            captured_point = pyautogui.locateOnScreen ( 'RedCapturePoint.png', confidence=0.9,)
+            captured_point = pyautogui.locateOnScreen ( 'RedCapturePoint.png', confidence=0.9, )
             if captured_point is None:
-                self.select_AllUnits()
-                self.enemy_tracker (  finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX )
-                self.attackAll(confidence, finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX)
+                self.select_AllUnits ()
+                self.enemy_tracker ( finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX )
+                self.attackAll ( confidence, finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX )
                 press ( key='ENTER', sec=.03 )
                 time.sleep ( .1 )
                 self.toggle_skills ( lord_card_position_x, lord_card_position_y )
                 time.sleep ( .1 )
-                time.sleep(20)
-                battle_end = self.battle_master_bop_player(battle_master_bop_adjust_x, battle_master_bop_adjust_y, finalMapSizeX, mapCornerX)
+                time.sleep ( 20 )
+                battle_end = self.battle_master_bop_player ( battle_master_bop_adjust_x, battle_master_bop_adjust_y,
+                                                             finalMapSizeX, mapCornerX )
             if captured_point is not None:
                 self.select_AllUnits ()
                 self.bring_unit_back ( mapCenterX, mapCenterY - 130 )
@@ -102,8 +111,22 @@ class SimpleMode:
                 time.sleep ( .1 )
                 self.toggle_skills ( lord_card_position_x, lord_card_position_y )
                 time.sleep ( .1 )
-                time.sleep(20)
+                time.sleep ( 20 )
+
+    # SM MAIN #
+    def smActive(self, mon_values, m_values, i_values, battle_master_bop_adjust_x, battle_master_bop_adjust_y, defense_line, confidence, game_Pointx , game_Pointy):
+        # ** code test order ** #
+        # ** INITIALIZATION ** #
+        self.mainTacticianTrait(game_Pointx, game_Pointy)
+        # ** PREP PHASE ** #
+        self.mainCommanderTrait(mon_values, m_values, i_values)
+        self.startBattle ()
+        # ** BATTLE PHASE ** #
+        self.mainTrackerTrait(defense_line, confidence)
+        self.mainBattleMasterTrait(battle_master_bop_adjust_x, battle_master_bop_adjust_y, confidence)
         # ** END ** #
+
+
 
 
     def attackAll(self, confidence, finalMapSizey, finalMapSizex, mapCornery, mapCornerx): #  Selects All Units Then Attacks The First Enemy From The Bottom Of The Screen
@@ -413,7 +436,7 @@ class SimpleMode:
                         one_pass = 1
 
 
-    def attack_first_center_area_small(self,confidence, finalMapSizey, finalMapSizex, mapCornerx): # Attacks First Enemy On The Screen Starting From Bottom But In A Smaller Radius So That Player Units Does Not Go Too Far From The Defensive Line
+    def attack_first_center_area_small(self, confidence, finalMapSizey, finalMapSizex, mapCornerx): # Attacks First Enemy On The Screen Starting From Bottom But In A Smaller Radius So That Player Units Does Not Go Too Far From The Defensive Line
         r_conf, g_conf, b_conf = confidence
         middle_x, middle_y, area_x, area_y = self.get_center_area_small (finalMapSizey, finalMapSizex, mapCornerx)
         one_pass = 0
@@ -913,3 +936,10 @@ class SimpleMode:
     def get_lord_data(self, finalMapSizey, finalMapSizex, mapCornerx): # Gets Lord Position Data
         lord_x, lord_y = self.get_LordIconData (finalMapSizey, finalMapSizex, mapCornerx)
         return  lord_x,lord_y
+
+
+        # self.mapDrag()
+        # finalMapSizeY, finalMapSizeX, mapCornerY, mapCornerX, mapCenterY, mapCenterX = self.get_MapSize ()
+        # self.toggleuniticon ()
+        # capturePointX, capturePointY = self.get_CapturePointData ( finalMapSizeX, finalMapSizeY, mapCornerX )
+        # total_units, units = self.unit_Counter (game_Pointx, game_Pointy, finalMapSizeY, finalMapSizeX, mapCornerX)

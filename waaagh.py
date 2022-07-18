@@ -100,9 +100,8 @@ def confidence_click():
         g_get = gslider.get()
         b_get = bslider.get()
 
-        confidence_get = r_get, g_get, b_get
+        confidence_get = int(r_get), int(g_get), int(b_get)
 
-        print ( r_get, g_get, b_get )
 
     conflbl = Label(confmenu, text="Adjust Confidence Values:").place(x=10, y=10)
 
@@ -205,14 +204,11 @@ def adj_click():
         # monsval_data, misval_data, infval_data
 
         if (int(type_state) == 1):
-            monsval_data = up_get, down_get, side_get, rotate_get
-            print(monsval_data)
+            monsval_data = int(up_get),int(down_get), int(side_get), int(rotate_get)
         elif (int(type_state) == 2):
-            misval_data = up_get, down_get, side_get, rotate_get
-            print(misval_data)
+            misval_data = int(up_get),int(down_get), int(side_get), int(rotate_get)
         elif (int(type_state) == 3):
-            infval_data = up_get, down_get, side_get, rotate_get
-            print(infval_data)
+            infval_data = int(up_get),int(down_get), int(side_get), int(rotate_get)
         else:
             print("Did not Work")
 
@@ -353,8 +349,9 @@ def trkr_click():
     def trk_getVal():
         global trk_get
 
-        trk_get = trkslidery.get()
-        print(trk_get)
+        trk_getInput = trkslidery.get()
+        trk_get = int(trk_getInput)
+
 
     trklbl = Label ( trkmenu, text="Adjustment Slider of Enemy Detection: " ).place ( x=10, y=10 )
     trkbtn = Button ( trkmenu, text="Apply Changes", command=trk_getVal, bd=3 ).place ( x=100, y=60 )
@@ -385,9 +382,11 @@ def bop_click():
         global bop_adjust_valx
         global bop_adjust_valy
 
-        bop_adjust_valx = bopsliderx.get()
-        bop_adjust_valy = bopslidery.get()
-        print(bop_adjust_valx, bop_adjust_valy)
+        bop_adjust_valxinput = bopsliderx.get()
+        bop_adjust_valx = int(bop_adjust_valxinput)
+        bop_adjust_valyinput = bopslidery.get()
+        bop_adjust_valy = int(bop_adjust_valyinput)
+
 
 
     boplbl = Label( bopmenu, text="Balance of Power Height Adjustment: " ).place( x=10, y=10 )
